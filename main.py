@@ -74,6 +74,6 @@ try:
     
 except Exception as ex:
     print(ex)
-finally:
-    driver.close()
-    driver.quit()
+# finally:
+#     driver.close()
+#     driver.quit()
