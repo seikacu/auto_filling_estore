@@ -16,13 +16,14 @@ from openpyxl import load_workbook
 from auth_data import user, password 
 
 
-print("Режимы работы:")
-print("1 - Открыть estore.gz и авторизоваться на сайте")
-print("2 - Ввести ссылку")
-print("3 - Заполнить форму данными из excel (консольный вариант)")
-print("4 - Заполнить форму данными из excel (диалоговое окно)")
-
-mode = int(input("Введите номер режима: "))
+# print("Режимы работы:")
+# print("1 - Открыть estore.gz и авторизоваться на сайте")
+# print("2 - Ввести ссылку")
+# print("3 - Заполнить форму данными из excel (консольный вариант)")
+# print("4 - Заполнить форму данными из excel (диалоговое окно)")
+# print("5 - Графический режим работы")
+#
+# mode = int(input("Введите номер режима: "))
 
 options = webdriver.ChromeOptions()
 
@@ -42,6 +43,12 @@ caps['pageLoadStrategy'] = 'eager'
 
 service = Service(desired_capabilities=caps, executable_path=r"C:\WebDriver\chromedriver\chromedriver.exe")
 driver = webdriver.Chrome(service=service, options=options)
+
+def switch_window(driver:webdriver.Chrome):
+    driver.switch_to.window(driver.window_handles[-1])
+    driver.execute_script("window.focus();")
+    
+# switch_window(driver)
 
 try:
     
@@ -108,7 +115,7 @@ try:
         
         sheet = get_sheet(wb)
         fill_form_from_sheet(sheet)
-        save_form(driver)
+        # save_form(driver)
         wb.close()
     
     # открыть файл excel через диалоговое окно
@@ -156,43 +163,152 @@ try:
             
             i += 1
             j += 1
+        
+
+    def on_ctrl_v():
+        text = root.clipboard_get()
+        root.event_generate("<<Paste>>", data=text)
             
-    # режим 1
-    if mode == 1:
+    def on_button1_click():
+        print("Запущена авторизация")
+        switch_window(driver)
         driver.get("https://account.gz-spb.ru/login")
         authentication(driver)
+    
+    def on_button2_click():
+        print("Запущен переход по ссылке")
+        switch_window(driver)
+        def handle_text():
+            text = text_input.get("1.0", "end-1c")
+            if text.strip():
+                print("Введенный текст:", text)
+                driver.get(text)
+                text_window.destroy()  # Закрываем окно после обработки текста
+                root.deiconify()  # Восстанавливаем видимость главного окна
+                
+        def paste_text(event):
+            text = root.clipboard_get()
+            text_input.insert("insert", text)
+            return "break"  # Останавливаем дальнейшую обработку событий
+        
+        def on_closing():
+            root.deiconify()  # Восстанавливаем видимость главного окна при закрытии диалогового окна
+            text_window.destroy()
 
-    # режим 2
-    if mode == 2:
-        url = str(input("Введите ссылку: "))
-        driver.get(url)
-        # driver.get("https://estore.gz-spb.ru/electronicshop/offer/create/297894?backurl=L3Byb2NlZHVyZS9mb3JtL3ZpZXcvMjk3ODk0Lz9iYWNrdXJsPUwyVnNaV04wY205dWFXTnphRzl3TDJOaGRHRnNiMmN2Y0hKdlkyVmtkWEpsTDJsdVpHVjRMejlyWlhsM2IzSmtjejBsUkRBbFFrRWxSREFsUWpBbFJEQWxRa1FsUkRFbE9EWW1iMlptWlhKZlpHRjBaVjlsYm1RdFpuSnZiVDB4T0M0d055NHlNREl6Sm1aMWJHeFRaV0Z5WTJnOU1DWT0=")
+        # Скрываем главное окно перед созданием диалогового окна
+        root.withdraw()
+    
+        # Создаем окно с вводом текста
+        text_window = tk.Toplevel(root)
+        text_window.title("Введите ссылку для перехода")
+
+        # Обработчик закрытия окна по крестику
+        text_window.protocol("WM_DELETE_WINDOW", on_closing)
+    
+        # Создаем виджет Text в окне
+        text_input = tk.Text(text_window, height=3, width=80)
+        text_input.pack(pady=10)
         
-    # режим 3
-    if mode == 3:
-        wb = get_wb()
-        sheet = get_sheet(wb)
-        fill_form_from_sheet(sheet)
-        save_form(driver)
-        wb.close()
-        
-    # режим 4
-    if mode == 4:
+        # Привязываем обработчик вставки текста по Ctrl+V
+        text_input.bind("<Control-v>", paste_text)
+    
+        # Создаем кнопку обработки текста в окне
+        process_button = tk.Button(text_window, text="Ок", command=handle_text)
+        process_button.pack(pady=10)
+                
+    def on_button3_click():
+        print("Запущен ввод excel файла")
+        switch_window(driver)
+        open_xlsx_file()
+        # Скрываем главное окно перед созданием диалогового окна
+        # root.withdraw()
         # Создание окна
-        root = tk.Tk()
-        root.title("Открыть XLSX файл")
+        # app = tk.Tk()
+        # app.title("Укажите файл импорта")
+        #
+        # # Установка ширины окна
+        # app.geometry("300x200")  # Измените значения, чтобы получить нужные размеры
+        #
+        # # Создание кнопки "Открыть файл"
+        # open_button = tk.Button(app, text="Открыть XLSX файл", command=open_xlsx_file)
+        # open_button.pack(pady=20)
+
+    
+    # def on_button4_click():
+    #     print("Запущен режим 4")
+    #
+    #
+    # # режим 1
+    # if mode == 1:
+    #     switch_window(driver)
+    #     driver.get("https://account.gz-spb.ru/login")
+    #     authentication(driver)
+    #
+    # # режим 2
+    # if mode == 2:
+    #     switch_window(driver)
+    #     url = str(input("Введите ссылку: "))
+    #     driver.get(url)
+    #
+    # # режим 3
+    # if mode == 3:
+    #     switch_window(driver)
+    #     wb = get_wb()
+    #     sheet = get_sheet(wb)
+    #     fill_form_from_sheet(sheet)
+    #     save_form(driver)
+    #     wb.close()
+    #
+    # # режим 4
+    # if mode == 4:
+    #     switch_window(driver)
+    #     # Создание окна
+    #     root = tk.Tk()
+    #     root.title("Открыть XLSX файл")
+    #
+    #     # Создание кнопки "Открыть файл"
+    #     open_button = tk.Button(root, text="Открыть XLSX файл", command=open_xlsx_file)
+    #     open_button.pack(pady=20)
+    #
+    #     # Привязка обработчика событий для Ctrl+V
+    #     root.bind("<Control-v>", on_ctrl_v)
+    #
+    #     # Запуск основного цикла обработки событий
+    #     root.mainloop()
+    #
+    # # режим 5 графический
+    # if mode == 5:
+    # switch_window(driver)
+    # Создание окна
+    root = tk.Tk()
+    root.title("АИС ГЗ: заполнение формы")
+                
+    # Создание кнопки 1
+    button1 = tk.Button(root, text="Авторизоваться", command=on_button1_click)
+    button1.pack(side=tk.LEFT, padx=15, pady=15)
         
-        # Создание кнопки "Открыть файл"
-        open_button = tk.Button(root, text="Открыть XLSX файл", command=open_xlsx_file)
-        open_button.pack(pady=20)
+    # Создание кнопки 2
+    button2 = tk.Button(root, text="Ввести ссылку", command=on_button2_click)
+    button2.pack(side=tk.LEFT, padx=15, pady=15)
         
-        # Запуск основного цикла обработки событий
-        root.mainloop()
+    # Создание кнопки 3
+    button3 = tk.Button(root, text="Выбрать и загрузить файл импорта excel", command=on_button3_click)
+    button3.pack(side=tk.LEFT, padx=15, pady=15)
+        
+        # Создание кнопки 4
+        # button4 = tk.Button(root, text="Режим 4", command=on_button4_click)
+        # button4.pack(side=tk.LEFT, padx=15, pady=15)
+        
+    # Установка окна "always on top" (всегда сверху)
+    root.wm_attributes("-topmost", 1)
+
+    # Запуск основного цикла обработки событий
+    root.mainloop()
         
     print("Программа завершена")
         
 except Exception as ex:
     print(ex)
-# finally:
-#     driver.close()
-#     driver.quit()
+finally:
+    # driver.close()
+    driver.quit()
