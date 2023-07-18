@@ -68,7 +68,7 @@ try:
             textarea.clear()
             textarea.send_keys(name)
         except NoSuchElementException:
-            print(f"Кнопка {arg} не найдена")
+            print(f"Поле {arg} не найдено")
             pass
 
     # заполнить input на сайте
@@ -78,8 +78,17 @@ try:
             inputVal.clear()
             inputVal.send_keys(name)
         except NoSuchElementException:
-            print(f"Кнопка {arg} не найдена")
+            print(f"Поле {arg} не найдено")
             pass
+    
+    # сохранить введенные данные в форме 
+    def save_form(driver:webdriver.Chrome):
+        try:
+            button = driver.find_element(By.XPATH, f"//input[@value='Сохранить черновик оферты']")
+            button.click()
+        except NoSuchElementException:
+            print(f"Кнопка [Сохранить черновик оферты] не найдена")
+            pass        
        
     def get_wb():
         
@@ -99,6 +108,7 @@ try:
         
         sheet = get_sheet(wb)
         fill_form_from_sheet(sheet)
+        save_form(driver)
         wb.close()
     
     # открыть файл excel через диалоговое окно
@@ -146,6 +156,7 @@ try:
             
             i += 1
             j += 1
+            
     # режим 1
     if mode == 1:
         driver.get("https://account.gz-spb.ru/login")
@@ -162,6 +173,7 @@ try:
         wb = get_wb()
         sheet = get_sheet(wb)
         fill_form_from_sheet(sheet)
+        save_form(driver)
         wb.close()
         
     # режим 4
