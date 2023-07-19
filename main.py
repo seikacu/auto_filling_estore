@@ -220,24 +220,8 @@ try:
         print("Запущен ввод excel файла")
         switch_window(driver)
         open_xlsx_file()
-        # Скрываем главное окно перед созданием диалогового окна
-        # root.withdraw()
-        # Создание окна
-        # app = tk.Tk()
-        # app.title("Укажите файл импорта")
-        #
-        # # Установка ширины окна
-        # app.geometry("300x200")  # Измените значения, чтобы получить нужные размеры
-        #
-        # # Создание кнопки "Открыть файл"
-        # open_button = tk.Button(app, text="Открыть XLSX файл", command=open_xlsx_file)
-        # open_button.pack(pady=20)
 
     
-    # def on_button4_click():
-    #     print("Запущен режим 4")
-    #
-    #
     # # режим 1
     # if mode == 1:
     #     switch_window(driver)
@@ -279,6 +263,7 @@ try:
     # # режим 5 графический
     # if mode == 5:
     # switch_window(driver)
+    
     # Создание окна
     root = tk.Tk()
     root.title("АИС ГЗ: заполнение формы")
@@ -294,11 +279,7 @@ try:
     # Создание кнопки 3
     button3 = tk.Button(root, text="Выбрать и загрузить файл импорта excel", command=on_button3_click)
     button3.pack(side=tk.LEFT, padx=15, pady=15)
-        
-        # Создание кнопки 4
-        # button4 = tk.Button(root, text="Режим 4", command=on_button4_click)
-        # button4.pack(side=tk.LEFT, padx=15, pady=15)
-        
+                
     # Установка окна "always on top" (всегда сверху)
     root.wm_attributes("-topmost", 1)
 
